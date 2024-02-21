@@ -4,12 +4,19 @@ import connectMongoDB from "./db/connectMongoDB.js";
 import { data } from "./data.js";
 import Transaction from "./models/transaction.js";
 import allRoutes from "./routes/allRoutes.js";
+import cors from "cors";
 
 const app = express();
 dotenv.config();
 // console.log(process.env.PORT);
 const PORT = process.env.PORT || 5000;
-
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true, //for headers cookies
+  })
+);
 connectMongoDB();
 app.use(express.json());
 

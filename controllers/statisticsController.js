@@ -2,8 +2,8 @@ import Transaction from "../models/transaction.js";
 
 export const getStatTransactions = async (req, res) => {
   try {
-    const { month } = req.body;
-
+    const { month } = req.query;
+    console.log("inside Statistics");
     // Extract the month part from the requested month (e.g., "07" from "2021-07")
     const requestedMonth = month.padStart(2, "0"); // Ensure it's a two-digit format
 

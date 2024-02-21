@@ -11,29 +11,39 @@ export const getTransactionsByFilter = async (req, res) => {
 
     // MongoDB query conditions for search
     const conditions = {
-      $or: [
-        { title: { $regex: search, $options: "i" } }, // Case-insensitive search for title
-        { description: { $regex: search, $options: "i" } }, // Case-insensitive search for description
-
-        {
-          // Fuzzy search for price
-          $expr: {
-            $lte: [
-              { $abs: { $subtract: ["$price", parseFloat(search)] } }, // Calculate the absolute difference between the prices
-              maxPriceDifference, // Maximum allowable difference
-            ],
-          },
-        },
-      ],
+      // $or: [
+      //   { title: { $regex: search, $options: "i" } }, // Case-insensitive search for title
+      //   { description: { $regex: search, $options: "i" } }, // Case-insensitive search for description
+      //   {
+      //     // Fuzzy search for price
+      //     $expr: {
+      //       $lte: [
+      //         { $abs: { $subtract: ["$price", parseFloat(search)] } }, // Calculate the absolute difference between the prices
+      //         maxPriceDifference, // Maximum allowable difference
+      //       ],
+      //     },
+      //   },
+      // ],
     };
 
     // find transaction in BD
 
     const totalCount = await Transaction.countDocuments(conditions);
-    const transactions = await Transaction.find(conditions)
-      .skip((page - 1) * perPage)
-      .limit(perPage);
+    // const transactions = await Transaction.find(conditions)
+    //   .skip((page - 1) * perPage)
+    //   .limit(perPage);
 
+    const transactions = await Transaction.aggregate([
+      {
+        $search: {
+          text: {
+            path: ["title", "price", "description"],
+            query: "Sand",
+          },
+        },
+      },
+    ]).skip((page - 1) * perPage);
+    console.log(transactions);
     // Calculate total pages for pagination
     const totalPages = Math.ceil(totalCount / perPage);
 
@@ -54,13 +64,14 @@ export const getTransactionsByFilter = async (req, res) => {
 
 export const getAllTransactionsByMonth = async (req, res) => {
   try {
-    const page = parseInt(req.body.page) || 1;
+    console.log("inside month get", req.query);
+    const page = parseInt(req.query.page) || 1;
     const limit = 10;
 
     // Calculate the skip value based on pagination parameters
     const skip = (page - 1) * limit;
-    let { month } = req.body;
-
+    let { month } = req.query;
+    console.log("month", month);
     // Ensure that the month is a valid number between 1 and 12
     month = parseInt(month);
     if (!isValidMonth(month)) {
@@ -74,6 +85,7 @@ export const getAllTransactionsByMonth = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
+    // console.log(transactions);
     // Count total number of transactions for the specified month
     const totalCount = await Transaction.countDocuments({ month: month });
 
@@ -81,7 +93,7 @@ export const getAllTransactionsByMonth = async (req, res) => {
     const totalPages = Math.ceil(totalCount / limit);
 
     // Return the retrieved transactions along with pagination metadata
-    res.json({
+    res.status(200).json({
       transactions,
       page,
       limit,
