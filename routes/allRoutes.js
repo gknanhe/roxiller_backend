@@ -4,13 +4,13 @@ import { getBarChartTransactions } from "../controllers/barChartController.js";
 import { getStatTransactions } from "../controllers/statisticsController.js";
 import {
   getTransactionsByFilter,
-  getAllTransactions,
+  getAllTransactionsByMonth,
 } from "../controllers/transactionsController.js";
 
 const router = express.Router();
 
 router.get("/filter", getTransactionsByFilter);
-router.get("/all", getAllTransactions);
+router.get("/month", getAllTransactionsByMonth);
 router.get("/stat-trasactions", getStatTransactions);
 router.get("/bar-chart-trasactions", getBarChartTransactions);
 

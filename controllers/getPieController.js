@@ -70,12 +70,6 @@ export const getPieTransactions = async (req, res) => {
       });
     }
 
-    // Set the start and end dates for the selected month
-    // Set the start and end dates for the selected month
-    // const startDate = new Date(Date.UTC(YYYY, month - 1, 1, 0, 0, 0));
-    // const endDate = new Date(Date.UTC(YYYY, month, 1, 0, 0, 0));
-    // console.log(startDate, endDate);
-
     // MongoDB aggregation pipeline to group transactions by category and count occurrences
     const aggregationPipeline = [
       {
